@@ -1,4 +1,4 @@
-package com.newidflightcontroller
+package com.idflightcontroller
 
 import android.app.Application
 import com.facebook.react.PackageList

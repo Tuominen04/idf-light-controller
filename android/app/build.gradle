@@ -77,9 +77,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.newidflightcontroller"
+    namespace "com.idflightcontroller"
     defaultConfig {
-        applicationId "com.newidflightcontroller"
+        applicationId "com.idflightcontroller"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
