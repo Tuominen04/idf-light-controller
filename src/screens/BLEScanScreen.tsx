@@ -8,7 +8,18 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import BLEService from '../services/BLEService';
+
+type RootStackParamList = {
+  Home: undefined;
+  BLEScan: undefined;
+  DeviceSetup: { device: BLEDevice };
+  DeviceControl: undefined;
+};
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'BLEScan'>;
 
 interface BLEDevice {
   id: string;
@@ -17,8 +28,10 @@ interface BLEDevice {
 }
 
 const BLEScanScreen = () => {
+  const navigation = useNavigation<NavigationProp>();
   const [devices, setDevices] = useState<BLEDevice[]>([]);
   const [scanning, setScanning] = useState(false);
+  const [connecting, setConnecting] = useState(false);
 
   useEffect(() => {
     // Start scanning automatically when screen opens
@@ -66,13 +79,29 @@ const BLEScanScreen = () => {
     }
   };
 
-  const handleDevicePress = (device: BLEDevice) => {
-    Alert.alert(
-      'Device Selected',
-      `Selected device: ${device.name}\nID: ${device.id}\nRSSI: ${device.rssi}`,
-      [{ text: 'OK' }]
-    );
-    // TODO: Navigate to device setup screen
+  const handleDevicePress = async (device: BLEDevice) => {
+    try {
+      setConnecting(true);
+      BLEService.stopScan(); // Stop scanning before connecting
+      
+    try {
+      await BLEService.connectToDevice(device.id);
+      // Navigate to setup screen after successful connection
+      navigation.navigate('DeviceSetup', { device });
+    } catch (error) {
+      Alert.alert(
+        'Connection Failed',
+        'Failed to connect to the device. Please try again.',
+        [{ text: 'OK' }]
+      );
+      console.error('Connection error:', error);
+    } finally {
+      setConnecting(false);
+    }
+    } catch (error) {
+      setConnecting(false);
+      console.error('Error handling device press:', error);
+    }
   };
 
   const renderDevice = ({ item }: { item: BLEDevice }) => (
@@ -91,6 +120,15 @@ const BLEScanScreen = () => {
   );
 
   const renderContent = () => {
+    if (connecting) {
+      return (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#2196F3" />
+          <Text style={styles.scanningText}>Connecting to device...</Text>
+        </View>
+      );
+    }
+
     if (scanning) {
       return (
         <View style={styles.centerContainer}>

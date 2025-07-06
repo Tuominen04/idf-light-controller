@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import HomeScreen from './src/screens/HomeScreen';
 import BLEScanScreen from './src/screens/BLEScanScreen';
+import DeviceSetupScreen from './src/screens/DeviceSetupScreen';
 import BLEService from './src/services/BLEService';
 
 const Stack = createStackNavigator();
@@ -13,7 +14,7 @@ const Stack = createStackNavigator();
 export type RootStackParamList = {
   Home: undefined;
   BLEScan: undefined;
-  DeviceSetup: undefined;
+  DeviceSetup: { device: { id: string; name: string; rssi: number | null } };
   DeviceControl: undefined;
 };
 
@@ -93,6 +94,13 @@ const App = () => {
             component={BLEScanScreen} 
             options={{
               title: 'Add Device',
+            }}
+          />
+          <Stack.Screen 
+            name="DeviceSetup" 
+            component={DeviceSetupScreen} 
+            options={{
+              title: 'Setup Device',
             }}
           />
         </Stack.Navigator>
