@@ -14,6 +14,11 @@ import {
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import BLEService from '../services/BLEService';
+import DeviceStorageService from '../services/DeviceStorageService';
+import { CREDENTIALS } from '../credentials';
+
+// Constants for storage (not needed anymore as it's in the service)
+// const DEVICES_STORAGE_KEY = '@saved_devices';
 
 type RootStackParamList = {
   Home: undefined;
@@ -30,8 +35,8 @@ const DeviceSetupScreen = () => {
   const navigation = useNavigation<NavigationProp>();
   const { device } = route.params;
 
-  const [ssid, setSsid] = useState('');
-  const [password, setPassword] = useState('');
+  const [ssid, setSsid] = useState(CREDENTIALS.wifiSsid || '');
+  const [password, setPassword] = useState(CREDENTIALS.wifiPassword || '');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
@@ -44,30 +49,151 @@ const DeviceSetupScreen = () => {
 
     try {
       setLoading(true);
-      setStatus('Sending WiFi credentials...');
+      setStatus('handleSendCredentials Sending WiFi credentials...');
 
       // Send WiFi credentials
       await BLEService.sendWiFiCredentials(ssid, password);
       
-      setStatus('Credentials sent! Waiting for device response...');
+      setStatus('Credentials sent! Waiting for device to connect to WiFi...');
 
-      // TODO: Monitor for device response
-      // For now, just show success after a delay
+      // Optionally, try a single read before monitoring
+      // Poll for device info since notifications aren't working
+      let pollCount = 0;
+      const maxPolls = 10;
+      const pollInterval = setInterval(async () => {
+        try {
+          const characteristic = await BLEService.readCharacteristicForService();
+          console.log(`Poll attempt ${pollCount + 1}:`, characteristic);
+          
+          if (characteristic && characteristic.trim() !== '') {
+            const deviceInfo = JSON.parse(characteristic);
+            if (deviceInfo.ip) {
+              clearInterval(pollInterval); // Stop polling
+              setStatus('Device connected to WiFi! Sending confirmation...');
+              
+              // Handle the device info (same code as in your monitor callback)
+              BLEService.sendConfirmation(true)
+                .then(async () => {
+                  // Save device info locally using the storage service
+                  const saved = await DeviceStorageService.saveDevice(deviceInfo);
+                  
+                  setLoading(false);
+                  
+                  if (saved) {
+                    Alert.alert(
+                      'Success!',
+                      `Device successfully connected and saved!\n\nDevice Name: ${deviceInfo.name}\nIP Address: ${deviceInfo.ip}`,
+                      [
+                        {
+                          text: 'OK',
+                          onPress: () => {
+                            // Disconnect BLE as we don't need it anymore
+                            BLEService.disconnect();
+                            // Navigate back to home
+                            navigation.navigate('Home');
+                          },
+                        },
+                      ]
+                    );
+                  } else {
+                    Alert.alert(
+                      'Partial Success',
+                      'Device connected but failed to save locally. You may need to set it up again.',
+                      [{ text: 'OK' }]
+                    );
+                  }
+                })
+                .catch((error) => {
+                  console.error('Failed to send confirmation:', error);
+                  Alert.alert('Error', 'Device connected but failed to send confirmation.');
+                });
+            }
+          }
+        } catch (err) {
+          console.log('Poll failed:', err);
+        }
+        
+        pollCount++;
+        if (pollCount >= maxPolls) {
+          clearInterval(pollInterval);
+          setLoading(false);
+          setStatus('');
+          Alert.alert(
+            'Timeout',
+            'Device did not respond in time. Please make sure the WiFi credentials are correct and try again.',
+            [{ text: 'OK' }]
+          );
+        }
+      }, 3000);
+      
+      // Monitor for device response
+      const unsubscribe = BLEService.monitorDeviceInfo((deviceInfo) => {
+        console.log('Received device info:', deviceInfo);
+        
+        // Device info format from firmware:
+        // {
+        //   "name": "ESP-C6-Light-A1B2C3D4",
+        //   "id": "A1B2C3D4",
+        //   "ip": "192.168.1.100",
+        //   "version": "0.0.1"
+        // }
+        
+        if (deviceInfo.ip) {
+          setStatus('Device connected to WiFi! Sending confirmation...');
+          
+          // Send confirmation back to device
+          BLEService.sendConfirmation(true)
+            .then(async () => {
+              unsubscribe(); // Stop monitoring
+                
+              // Save device info locally using the storage service
+              const saved = await DeviceStorageService.saveDevice(deviceInfo);
+              
+              setLoading(false);
+              
+              if (saved) {
+                Alert.alert(
+                'Success!',
+                `Device successfully connected and saved!\n\nDevice Name: ${deviceInfo.name}\nIP Address: ${deviceInfo.ip}`,
+                [
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                      // Disconnect BLE as we don't need it anymore
+                      BLEService.disconnect();
+                      // Navigate back to home
+                      navigation.navigate('Home');
+                      },
+                    },
+                ]
+                );
+              } else {
+                Alert.alert(
+                'Partial Success',
+                'Device connected but failed to save locally. You may need to set it up again.',
+                [{ text: 'OK' }]
+                );
+              }
+          }).catch((error) => {
+            console.error('Failed to send confirmation:', error);
+            Alert.alert('Error', 'Device connected but failed to send confirmation.');
+          });
+        }
+      });
+
+      //Timeout after 30 seconds
       setTimeout(() => {
-        Alert.alert(
-          'Success!',
-          'WiFi credentials have been sent to the device.',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                // TODO: Navigate to device control or home
-                navigation.navigate('Home');
-              },
-            },
-          ]
-        );
-      }, 2000);
+        unsubscribe();
+        if (loading) {
+          setLoading(false);
+          setStatus('');
+          Alert.alert(
+            'Timeout',
+            'Device did not respond in time. Please make sure the WiFi credentials are correct and try again.',
+            [{ text: 'OK' }]
+          );
+        }
+      }, 30000);
 
     } catch (error) {
       console.error('Failed to send credentials:', error);
@@ -76,7 +202,6 @@ const DeviceSetupScreen = () => {
         'Failed to send WiFi credentials. Please try again.',
         [{ text: 'OK' }]
       );
-    } finally {
       setLoading(false);
       setStatus('');
     }

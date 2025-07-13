@@ -137,6 +137,47 @@ class BLEServiceClass {
     }, duration);
   }
 
+  monitorDeviceInfo(onUpdate: (deviceInfo: any) => void): () => void {
+    if (!this.connectedDevice) {
+      throw new Error('No device connected');
+    }
+
+    console.log('Starting to monitor device info characteristic');
+    
+    // Optionally, do a single read before monitoring (handled in DeviceSetupScreen)
+    // Do NOT mix polling/retries with monitor subscription.
+
+    const subscription = this.connectedDevice.monitorCharacteristicForService(
+      BLE_CONSTANTS.SERVICE_UUID,
+      BLE_CONSTANTS.DEVICE_INFO_CHARACTERISTIC_UUID,
+      (error, characteristic) => {
+        if (error) {
+          console.error('Monitor error:', error);
+          return;
+        }
+
+        if (characteristic?.value) {
+          try {
+            const jsonStr = base64.decode(characteristic.value);
+            console.log('Received device info notification:', jsonStr);
+            const deviceInfo = JSON.parse(jsonStr);
+            onUpdate(deviceInfo);
+            return; // Exit early if we got the data
+          } catch (e) {
+            console.error('Failed to parse device info:', e);
+            return;
+          }
+        }
+      }
+    );
+
+    // Return unsubscribe function
+    return () => {
+      console.log('Stopping device info monitor');
+      subscription.remove();
+    };
+  };
+
   // Stop scanning
   stopScan(): void {
     if (this.scanning) {
@@ -189,6 +230,48 @@ class BLEServiceClass {
       BLE_CONSTANTS.WIFI_CHARACTERISTIC_UUID,
       base64Data
     );
+  }
+
+  async sendConfirmation(success: boolean): Promise<void> { 
+    if (!this.connectedDevice) {
+      throw new Error('No device connected');
+    }
+
+    const message = { success: success ? 1 : 0 };
+    const messageJson = JSON.stringify(message);
+    const base64Data = base64.encode(messageJson);
+
+    console.log('Sending confirmation:', success);
+    await this.connectedDevice.writeCharacteristicWithResponseForService(
+      BLE_CONSTANTS.SERVICE_UUID,
+      BLE_CONSTANTS.WIFI_CHARACTERISTIC_UUID,
+      base64Data
+    );
+  };
+
+  async readCharacteristicForService(): Promise<string> {
+    if (!this.connectedDevice) {
+      throw new Error('No device connected');
+    }
+
+    try {
+      const characteristic = await this.connectedDevice.readCharacteristicForService(
+        BLE_CONSTANTS.SERVICE_UUID,
+        BLE_CONSTANTS.DEVICE_INFO_CHARACTERISTIC_UUID
+      );
+      console.log('Characteristic read successfully:', characteristic);
+      
+      if (characteristic.value && characteristic.value !== "AA==") {
+        const decodedValue = base64.decode(characteristic.value);
+        console.log('Read characteristic value:', decodedValue);
+        return decodedValue;
+      } else {
+        throw new Error('Characteristic value is empty');
+      }
+    } catch (error) {
+      console.error('Failed to read characteristic:', error);
+      throw error;
+    }
   }
 
   // Disconnect from device
