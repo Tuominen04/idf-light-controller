@@ -3,10 +3,12 @@ import { TouchableOpacity, Text, StyleSheet, View, ActivityIndicator } from 'rea
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import HomeScreen from './src/screens/HomeScreen';
+import { HomeScreen } from './src/screens/HomeScreen';
 import BLEScanScreen from './src/screens/BLEScanScreen';
 import DeviceSetupScreen from './src/screens/DeviceSetupScreen';
+import DeviceControlScreen from './src/screens/DeviceControlScreen';
 import BLEService from './src/services/BLEService';
+import { SavedDevice } from './src/services/DeviceStorageService';
 
 const Stack = createStackNavigator();
 
@@ -15,7 +17,7 @@ export type RootStackParamList = {
   Home: undefined;
   BLEScan: undefined;
   DeviceSetup: { device: { id: string; name: string; rssi: number | null } };
-  DeviceControl: undefined;
+  DeviceControl: { device: SavedDevice };
 };
 
 const App = () => {
@@ -102,6 +104,15 @@ const App = () => {
             options={{
               title: 'Setup Device',
             }}
+          />
+          <Stack.Screen 
+            name="DeviceControl" 
+            component={DeviceControlScreen} 
+            options={({ route }) => ({
+              title: 'Control Device',
+              // You can also use the device name in the title
+              // title: route.params.device.name,
+            })}
           />
         </Stack.Navigator>
       </NavigationContainer>
