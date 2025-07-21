@@ -80,21 +80,10 @@ const DeviceSetupScreen = () => {
                   setLoading(false);
                   
                   if (saved) {
-                    Alert.alert(
-                      'Success!',
-                      `Device successfully connected and saved!\n\nDevice Name: ${deviceInfo.name}\nIP Address: ${deviceInfo.ip}`,
-                      [
-                        {
-                          text: 'OK',
-                          onPress: () => {
-                            // Disconnect BLE as we don't need it anymore
-                            BLEService.disconnect();
-                            // Navigate back to home
-                            navigation.navigate('Home');
-                          },
-                        },
-                      ]
-                    );
+                    // Disconnect BLE as we don't need it anymore
+                    BLEService.disconnect();
+                    // Navigate back to home
+                    navigation.navigate('Home');
                   } else {
                     Alert.alert(
                       'Partial Success',

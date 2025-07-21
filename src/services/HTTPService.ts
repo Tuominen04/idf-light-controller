@@ -68,6 +68,15 @@ class HTTPService {
   }
 
   /**
+   * Get the current light connectivity
+   */
+  async getDeviceOnlineStatus(ip: string): Promise<DeviceStatus> {
+    return this.makeRequest<DeviceStatus>(ip, API_ENDPOINTS.ONLINE_STATUS, {
+      method: 'GET',
+    });
+  }
+
+  /**
    * Get the current light status
    */
   async getLightStatus(ip: string): Promise<DeviceStatus> {
@@ -118,30 +127,10 @@ class HTTPService {
    */
   async checkConnection(ip: string): Promise<boolean> {
     try {
-      await this.getLightStatus(ip);
+      await this.getDeviceOnlineStatus(ip);
       return true;
     } catch (error) {
       console.log(`Device ${ip} unreachable:`, error);
-      return false;
-    }
-  }
-
-  /**
-   * Ping device with minimal request
-   */
-  async ping(ip: string): Promise<boolean> {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // Short timeout for ping
-
-      const response = await fetch(`http://${ip}${API_ENDPOINTS.LIGHT_STATUS}`, {
-        method: 'HEAD', // Use HEAD to minimize data transfer
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-      return response.ok;
-    } catch (error) {
       return false;
     }
   }

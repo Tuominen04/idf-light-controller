@@ -15,6 +15,7 @@ export const APP_CONSTANTS = {
 
 // HTTP API endpoints
 export const API_ENDPOINTS = {
+  ONLINE_STATUS: '/online',
   LIGHT_STATUS: '/light',
   TOGGLE_LIGHT: '/toggle',
   FIRMWARE_INFO: '/ota/firmware-info',

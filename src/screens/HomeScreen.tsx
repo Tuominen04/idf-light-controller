@@ -51,7 +51,7 @@ export const HomeScreen = () => {
   const checkDeviceConnectivity = async (deviceList: SavedDevice[]) => {
     const statusPromises = deviceList.map(async (device) => {
       try {
-        const isConnected = await HTTPService.ping(device.ip);
+        const isConnected = await HTTPService.checkConnection(device.ip);
         return { [device.id]: isConnected };
       } catch (error) {
         return { [device.id]: false };
@@ -88,39 +88,11 @@ export const HomeScreen = () => {
   };
 
   const handleDevicePress = (device: SavedDevice) => {
-    const isConnected = deviceStatuses[device.id];
-    
-    Alert.alert(
-      device.name,
-      `IP: ${device.ip}\nVersion: ${device.version}\nStatus: ${isConnected ? 'Online' : 'Offline'}\nLast Connected: ${new Date(device.lastConnected).toLocaleString()}`,
-      [
-        { 
-          text: 'Control', 
-          onPress: () => navigation.navigate('DeviceControl', { device }),
-        },
-        { 
-          text: 'Delete', 
-          onPress: () => confirmDelete(device), 
-          style: 'destructive' 
-        },
-        { text: 'Cancel', style: 'cancel' },
-      ]
-    );
+    navigation.navigate('DeviceControl', { device })
   };
 
   const navigateToControl = (device: SavedDevice) => {
     navigation.navigate('DeviceControl', { device });
-  };
-
-  const confirmDelete = (device: SavedDevice) => {
-    Alert.alert(
-      'Delete Device',
-      `Are you sure you want to delete ${device.name}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', onPress: () => deleteDevice(device.id), style: 'destructive' },
-      ]
-    );
   };
 
   const renderDevice = ({ item }: { item: SavedDevice }) => {
@@ -146,22 +118,6 @@ export const HomeScreen = () => {
         ]}>
           {isConnected ? 'Online' : 'Offline'}
         </Text>
-        
-        <View style={styles.deviceActions}>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.controlButton]}
-            onPress={() => navigateToControl(item)}
-          >
-            <Text style={styles.controlButtonText}>Control</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[styles.actionButton, styles.deleteButton]}
-            onPress={() => confirmDelete(item)}
-          >
-            <Text style={styles.deleteButtonText}>Delete</Text>
-          </TouchableOpacity>
-        </View>
       </TouchableOpacity>
     );
   };
