@@ -10,7 +10,7 @@ import {
   Modal,
   RefreshControl,
 } from 'react-native';
-import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
+import { useRoute, RouteProp, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SavedDevice } from '../services/DeviceStorageService';
 import HTTPService, { FirmwareInfo } from '../services/HTTPService';
 import { IPCONFIG } from '../credentials';
@@ -51,12 +51,17 @@ const DeviceControlScreen = () => {
   const [otaProgress, setOTAProgress] = useState<OTAProgress | null>(null);
   const [showOTAModal, setShowOTAModal] = useState(false);
 
-  // Check device connection and get initial state
-  useEffect(() => {
-    checkDeviceConnection();
-    const interval = setInterval(checkDeviceConnection, 10000); // Check every 10 seconds
-    return () => clearInterval(interval);
-  }, []);
+  // Poll device connection only when screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      let interval: NodeJS.Timeout | null = null;
+      checkDeviceConnection();
+      interval = setInterval(checkDeviceConnection, 10000);
+      return () => {
+        if (interval) clearInterval(interval);
+      };
+    }, [device])
+  );
 
   const refreshDeviceData = async () => {
     setRefreshing(true);

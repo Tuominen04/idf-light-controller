@@ -73,11 +73,7 @@ export const HomeScreen = () => {
     try {
       const success = await DeviceStorageService.deleteDevice(deviceId);
       if (success) {
-        setDevices(devices.filter(d => d.id !== deviceId));
-        // Remove from status tracking
-        const newStatuses = { ...deviceStatuses };
-        delete newStatuses[deviceId];
-        setDeviceStatuses(newStatuses);
+        await loadDevices(); // Reload from storage after deletion
       } else {
         Alert.alert('Error', 'Failed to delete device');
       }
@@ -89,10 +85,6 @@ export const HomeScreen = () => {
 
   const handleDevicePress = (device: SavedDevice) => {
     navigation.navigate('DeviceControl', { device })
-  };
-
-  const navigateToControl = (device: SavedDevice) => {
-    navigation.navigate('DeviceControl', { device });
   };
 
   const renderDevice = ({ item }: { item: SavedDevice }) => {
