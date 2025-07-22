@@ -91,7 +91,7 @@ class BLEServiceClass {
   // Scan for ESP32 devices
   async scanForDevices(
     onDeviceFound: (device: BLEDevice) => void,
-    duration: number = 10000
+    duration: number
   ): Promise<void> {
     if (this.scanning) {
       console.log('Already scanning');
@@ -113,14 +113,9 @@ class BLEServiceClass {
         }
 
         if (device && device.name) {
-          // Check if device name starts with our prefix
           if (device.name.startsWith(BLE_CONSTANTS.DEVICE_NAME_PREFIX)) {
-            // Update or add device
-            foundDevices.set(device.id, device);
-            
             console.log(`Found device: ${device.name} (${device.id}) RSSI: ${device.rssi}`);
-            
-            // Notify callback
+            // Always notify callback, even if already found (for RSSI updates)
             onDeviceFound({
               id: device.id,
               name: device.name,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -43,41 +43,78 @@ const BLEScanScreen = () => {
     };
   }, []);
 
-  const startScan = async () => {
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={{ marginRight: 16 }}
+          onPress={() => scanning ? stopScan() : startScan()}
+        >
+          <Text style={styles.scanButton}>{scanning ? "Stop" : "Scan"}</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, scanning, devices]);
 
+  const handleDeviceFound = (device: BLEDevice) => {
+    console.log(`Handle device: ${device.name}`);
+    // Check if device already exists
+    setDevices(prevDevices => {
+      const existingIndex = prevDevices.findIndex(d => d.id === device.id);
+      console.log(`Device ${device.name} found, existing index: ${existingIndex}`);
+      if (existingIndex >= 0) {
+        // Update existing device (e.g., RSSI)
+        const updatedDevices = [...prevDevices];
+        updatedDevices[existingIndex] = device;
+        return updatedDevices;
+      } else {
+        // Add new device
+        return [...prevDevices, device];
+      }
+    });
+  };
+
+  const startScan = async () => {
+    console.log('Start scan...');
+    const timeoutTimeout = 10000;
     try {
       setScanning(true);
       setDevices([]); // Clear previous devices
 
-      await BLEService.scanForDevices((device: BLEDevice) => {
-        console.log('Device found in UI:', device);
-        setDevices(prevDevices => {
-          // Check if device already exists
-          const existingIndex = prevDevices.findIndex(d => d.id === device.id);
-          if (existingIndex >= 0) {
-            // Update existing device (e.g., RSSI value)
-            const updatedDevices = [...prevDevices];
-            updatedDevices[existingIndex] = device;
-            return updatedDevices;
-          } else {
-            // Add new device
-            return [...prevDevices, device];
-          }
-        });
-      });
+      BLEService.scanForDevices(
+        (device: BLEDevice) => {
+          handleDeviceFound(device)
+        },
+        timeoutTimeout
+      );
 
       // Stop scanning after 10 seconds
       setTimeout(() => {
         setScanning(false);
         BLEService.stopScan();
-      }, 10000);
+      }, timeoutTimeout);
 
     } catch (error) {
-      console.error('Scan error:', error);
       setScanning(false);
+      console.error('Scan error:', error);
       Alert.alert('Scan Error', 'Failed to start scanning. Please try again.');
     }
   };
+
+  const stopScan = () => {
+    console.log('Stopping scan...');
+    try {
+      if(scanning) {
+        BLEService.stopScan();
+      }
+    } catch (error) {
+      console.error('Error stopping scan:', error);
+      Alert.alert('Stop Scan Error', 'Failed to stop scanning. Please try again.');
+    } finally {
+      console.log('Scan stopped');
+      setScanning(false);
+    }
+  }
 
   const handleDevicePress = async (device: BLEDevice) => {
     try {
@@ -129,7 +166,7 @@ const BLEScanScreen = () => {
       );
     }
 
-    if (scanning) {
+    if (scanning && devices.length === 0) {
       return (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color="#2196F3" />
@@ -143,20 +180,25 @@ const BLEScanScreen = () => {
       return (
         <View style={styles.centerContainer}>
           <Text style={styles.noDevicesText}>No devices found</Text>
-          <TouchableOpacity style={styles.scanButton} onPress={startScan}>
-            <Text style={styles.scanButtonText}>Scan Again</Text>
-          </TouchableOpacity>
         </View>
       );
     }
 
     return (
-      <FlatList
-        data={devices}
-        keyExtractor={(item) => item.id}
-        renderItem={renderDevice}
-        contentContainerStyle={styles.listContent}
-      />
+      <View style={styles.scanningContainer}>
+        <FlatList
+          data={devices}
+          keyExtractor={(item) => item.id}
+          renderItem={renderDevice}
+          contentContainerStyle={styles.listContent}
+        />
+        {scanning && (
+          <>
+            <Text style={styles.scanningSubtext}>Still Scanning</Text>
+            <ActivityIndicator size="large" color="#2196F3" />
+          </>
+        )}
+      </View>
     );
   };
 
@@ -178,6 +220,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
+  scanningContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 5,
+  },
   scanningText: {
     fontSize: 18,
     fontWeight: '600',
@@ -188,6 +235,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 8,
+    marginBottom: 12,
+    alignSelf: 'center',
   },
   noDevicesText: {
     fontSize: 18,
@@ -195,10 +244,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   scanButton: {
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 30,
-    paddingVertical: 12,
-    borderRadius: 25,
+    color: '#ffffffff', 
+    fontWeight: 'bold',
+    fontSize: 18,
+    paddingHorizontal: 20,
   },
   scanButtonText: {
     color: '#fff',

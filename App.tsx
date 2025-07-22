@@ -96,6 +96,7 @@ const App = () => {
             component={BLEScanScreen} 
             options={{
               title: 'Add Device',
+              headerShown: true
             }}
           />
           <Stack.Screen 
