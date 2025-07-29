@@ -293,12 +293,10 @@ const DeviceControlScreen = () => {
         <Text style={styles.infoLabel}>IP Address:</Text>
         <Text style={styles.infoValue}>{device.ip}</Text>
       </View>
-      {firmwareInfo && (
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Project:</Text>
-          <Text style={styles.infoValue}>{firmwareInfo.project_name}</Text>
-        </View>
-      )}
+      <View style={styles.infoRow}>
+        <Text style={styles.infoLabel}>Project:</Text>
+        <Text style={styles.infoValue}>{device.projectName}</Text>
+      </View>
       <View style={styles.infoRow}>
         <Text style={styles.infoLabel}>Version:</Text>
         <Text style={styles.infoValue}>{device.version}</Text>
@@ -307,20 +305,16 @@ const DeviceControlScreen = () => {
         <Text style={styles.infoLabel}>Last Connected:</Text>
         <Text style={styles.infoValue}>{formatDateTime(device.lastConnected)}</Text>
       </View>
-      {firmwareInfo && (
-        <>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Build Date:</Text>
-            <Text style={styles.infoValue}>{formatDateTime(firmwareInfo.date, firmwareInfo.time)}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>OTA Status:</Text>
-            <Text style={[styles.infoValue, { color: firmwareInfo.ota_in_progress ? '#FF9800' : '#4CAF50' }]}>
-              {firmwareInfo.ota_in_progress ? 'In Progress' : 'Ready'}
-            </Text>
-          </View>
-        </>
-      )}
+      <View style={styles.infoRow}>
+        <Text style={styles.infoLabel}>Build Date:</Text>
+        <Text style={styles.infoValue}>{formatDateTime(device.buildDate ?? '')}</Text>
+      </View>
+      <View style={styles.infoRow}>
+        <Text style={styles.infoLabel}>OTA Status:</Text>
+        <Text style={[styles.infoValue, { color: device.otaStatus ? '#FF9800' : '#4CAF50' }]}>
+          {device.otaStatus ? 'In Progress' : 'Ready'}
+        </Text>
+      </View>
     </View>
   );
 

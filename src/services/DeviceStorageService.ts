@@ -6,8 +6,11 @@ export interface SavedDevice {
   id: string;
   name: string;
   ip: string;
+  projectName?: string; // Fetch later after device connection
   version: string;
   lastConnected: string;
+  buildDate?: string; // Fetch later after device connection
+  otaStatus?: boolean; // Optional OTA status
 }
 
 class DeviceStorageService {
@@ -19,6 +22,17 @@ class DeviceStorageService {
     } catch (error) {
       console.error('Failed to get devices:', error);
       return [];
+    }
+  }
+
+  // Get a specific device by ID
+  async getDevice(deviceId: string): Promise<SavedDevice | null> {
+    try {
+      const devices = await this.getDevices();
+      return devices.find(d => d.id === deviceId) || null;
+    } catch (error) {
+      console.error('Failed to get device:', error);
+      return null;
     }
   }
 
@@ -59,17 +73,6 @@ class DeviceStorageService {
     } catch (error) {
       console.error('Failed to delete device:', error);
       return false;
-    }
-  }
-
-  // Get a specific device by ID
-  async getDevice(deviceId: string): Promise<SavedDevice | null> {
-    try {
-      const devices = await this.getDevices();
-      return devices.find(d => d.id === deviceId) || null;
-    } catch (error) {
-      console.error('Failed to get device:', error);
-      return null;
     }
   }
 
