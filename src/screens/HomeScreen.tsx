@@ -5,14 +5,12 @@ import {
   StyleSheet, 
   FlatList, 
   TouchableOpacity,
-  Alert,
   RefreshControl,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import DeviceStorageService, { SavedDevice } from '../services/DeviceStorageService';
 import HTTPService, { FirmwareInfo } from '../services/HTTPService';
-import { Device } from 'react-native-ble-plx';
 
 type RootStackParamList = {
   Home: undefined;

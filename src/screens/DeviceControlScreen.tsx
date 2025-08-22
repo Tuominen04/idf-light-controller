@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useRoute, RouteProp, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SavedDevice } from '../services/DeviceStorageService';
-import HTTPService, { FirmwareInfo } from '../services/HTTPService';
+import HTTPService from '../services/HTTPService';
 import { IPCONFIG } from '../credentials';
 import { StackNavigationProp } from '@react-navigation/stack';
 import DeviceStorageService from '../services/DeviceStorageService';
@@ -46,10 +46,22 @@ const DeviceControlScreen = () => {
   const [lightState, setLightState] = useState<'on' | 'off'>('off');
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [otaLoading, setOtaLoading] = useState(false);
   const [refresh, setRefreshing] = useState(false);
-  const [firmwareInfo, setFirmwareInfo] = useState<FirmwareInfo | null>(null);
   const [otaProgress, setOTAProgress] = useState<OTAProgress | null>(null);
   const [showOTAModal, setShowOTAModal] = useState(false);
+  const [monitoringOTA, setMonitoringOTA] = useState(false);
+  const otaIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clear interval on unmount
+  useEffect(() => {
+    return () => {
+      if (otaIntervalRef.current) {
+        clearInterval(otaIntervalRef.current);
+        otaIntervalRef.current = null;
+      }
+    };
+  }, []);
 
   // Poll device connection only when screen is focused
   useFocusEffect(
@@ -82,10 +94,49 @@ const DeviceControlScreen = () => {
 
   const checkDeviceConnection = async () => {
     try {
+      getSavedInfo();
       await getDeviceInfo();
     } catch (error) {
       console.error('Connection check failed:', error);
       setIsConnected(false);
+    }
+  };
+
+  const getOtaProgress = async (savedDevice: SavedDevice) => {
+    try {
+      const httpDevice = await DeviceStorageService.getDevice(savedDevice.id);
+      const progress = await HTTPService.getOTAProgress(device.ip);
+
+      console.log('OTA http:', httpDevice);
+      console.log('OTA progress:', progress);
+      const otaProgress =  { 
+        status: progress.status,
+        in_progress: !!httpDevice?.otaStatus || progress.in_progress, 
+        progress: progress.progress 
+      };
+
+      setOTAProgress(otaProgress);
+      if (otaProgress?.in_progress) {
+        setOtaLoading(true);
+        monitorOTAProgress();
+        setOtaLoading(false);
+      }
+    } catch (error) {
+      console.warn('Failed to get OTA progress:', error);
+    }
+  };
+
+  const getSavedInfo = async () => {
+    try {
+      const savedDevice = await DeviceStorageService.getDevice(device.id);
+      if (savedDevice) {
+        getOtaProgress(savedDevice);
+        setIsConnected(true);
+      } else {
+        console.warn('No saved device info found');
+      }
+    } catch (error) {
+      console.error('Failed to get saved device info:', error);
     }
   };
 
@@ -109,10 +160,11 @@ const DeviceControlScreen = () => {
       if (!info) {
         throw new Error('No firmware info received');
       }
-      setFirmwareInfo(info);
 
       // Create a SavedDevice object and save it
+      const prev = await DeviceStorageService.getDevice(device.id);
       const savedDevice: SavedDevice = {
+        ...prev, // keep previous fields like projectName, buildDate, otaStatus, etc.
         id: device.id,
         name: device.name,
         ip: device.ip,
@@ -151,9 +203,19 @@ const DeviceControlScreen = () => {
     try {
       await HTTPService.startOTAUpdate(device.ip, otaUrl);
       setShowOTAModal(false);
-      Alert.alert('Success', 'OTA update started successfully!');
       
       // Start monitoring OTA progress
+      const deviceInfo = await DeviceStorageService.getDevice(device.id);
+      if (!deviceInfo) {
+        console.error('Device not found in storage');
+        return;
+      }
+      const deviceToSave: SavedDevice = {
+        ...deviceInfo,
+        otaStatus: true, // Mark OTA as in progress
+      };
+      await DeviceStorageService.saveDevice(deviceToSave);
+
       monitorOTAProgress();
     } catch (error) {
       console.error('OTA update failed:', error);
@@ -164,11 +226,19 @@ const DeviceControlScreen = () => {
   };
 
   const monitorOTAProgress = () => {
-    const interval = setInterval(async () => {
+    if (monitoringOTA) return; // Prevent duplicate intervals
+    setMonitoringOTA(true);
+
+    if (otaIntervalRef.current) {
+      clearInterval(otaIntervalRef.current);
+      otaIntervalRef.current = null;
+    }
+
+    otaIntervalRef.current = setInterval(async () => {
       try {
         const progress = await HTTPService.getOTAProgress(device.ip);
         if (!progress) {
-          console.error('No OTA progress data received');
+          console.warn('No OTA progress data received');
           return;
         }
 
@@ -178,23 +248,32 @@ const DeviceControlScreen = () => {
         }
         
         if (!progress.in_progress) {
-          clearInterval(interval);
+          if (otaIntervalRef.current) {
+            clearInterval(otaIntervalRef.current);
+            otaIntervalRef.current = null;
+          }
           setOTAProgress(null);
-          Alert.alert('OTA Complete', 'Firmware update completed successfully!');
-          // Refresh firmware info
+          setMonitoringOTA(false); // Allow future monitoring
+          // Update device info to clear otaStatus
+          const deviceInfo = await DeviceStorageService.getDevice(device.id);
+          if (deviceInfo) {
+            await DeviceStorageService.saveDevice({ ...deviceInfo, otaStatus: false });
+          }
+          setOTAProgress(null);
           setTimeout(getDeviceInfo, 2000);
         }
       } catch (error) {
-        console.error('Failed to get OTA progress:', error);
-        clearInterval(interval);
-        setOTAProgress(null);
+        console.warn('Failed to monitoring OTA progress:', error);
       }
     }, 2000);
 
-    // Stop monitoring after 5 minutes
     setTimeout(() => {
-      clearInterval(interval);
+      if (otaIntervalRef.current) {
+        clearInterval(otaIntervalRef.current);
+        otaIntervalRef.current = null;
+      }
       setOTAProgress(null);
+      setMonitoringOTA(false);
     }, 300000);
   };
 
@@ -325,10 +404,10 @@ const DeviceControlScreen = () => {
         Upload new firmware to your device over WiFi
       </Text>
       
-      {otaProgress && (
+      {otaProgress?.in_progress && (
         <View style={styles.otaProgress}>
-          <Text style={styles.otaStatusText}>{otaProgress.status || 'Updating...'}</Text>
-          {otaProgress.progress !== undefined && (
+          <Text style={styles.otaStatusText}>{otaProgress.status}</Text>
+          {otaProgress.progress && (
             <View style={styles.progressBar}>
               <View 
                 style={[styles.progressFill, { width: `${otaProgress.progress}%` }]} 
@@ -374,9 +453,9 @@ const DeviceControlScreen = () => {
             <TouchableOpacity
               style={[styles.modalButton, styles.confirmButton]}
               onPress={startOTAUpdate}
-              disabled={loading===true || refresh===true}
+              disabled={loading || refresh || otaLoading}
             >
-              {loading || refresh ? (
+              {loading || refresh || otaLoading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
                 <Text style={styles.confirmButtonText}>Start Update</Text>
