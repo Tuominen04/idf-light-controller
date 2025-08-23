@@ -9,6 +9,7 @@ import DeviceSetupScreen from './src/device/DeviceSetupScreen';
 import DeviceControlScreen from './src/device/DeviceControlScreen';
 import BLEService from './src/ble/BLEService';
 import { SavedDevice } from './src/device/DeviceStorageService';
+import styles from './src/styles/App.styles';
 
 const Stack = createStackNavigator();
 
@@ -109,7 +110,7 @@ const App = () => {
           <Stack.Screen 
             name="DeviceControl" 
             component={DeviceControlScreen} 
-            options={({ route }) => ({
+            options={() => ({
               title: 'Control Device',
               // You can also use the device name in the title
               // title: route.params.device.name,
@@ -120,28 +121,5 @@ const App = () => {
     </SafeAreaProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  loadingText: {
-    marginTop: 20,
-    fontSize: 16,
-    color: '#666',
-  },
-  headerButton: {
-    marginRight: 15,
-    padding: 8,
-  },
-  headerButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default App;
