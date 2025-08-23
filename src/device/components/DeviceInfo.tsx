@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import styles from "../../styles/DeviceControlScreen.styles";
 import { SavedDevice } from "../DeviceStorageService";
-import { formatDateTime } from "../../utils/formatDateTime";
+import { formatDateTime } from "../../utils/FormatDateTime";
 
 export const renderConnectionStatus = (isConnected: boolean) => (
     <View style={styles.statusContainer}>
