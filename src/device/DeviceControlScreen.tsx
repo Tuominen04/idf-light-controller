@@ -3,41 +3,26 @@ import {
   View,
   Text,
   TouchableOpacity,
-  ActivityIndicator,
   Alert,
   ScrollView,
-  Modal,
   RefreshControl,
 } from 'react-native';
-import { useRoute, RouteProp, useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import { SavedDevice } from './DeviceStorageService';
 import HTTPService from '../http/HTTPService';
-import { IPCONFIG } from '../credentials';
-import { StackNavigationProp } from '@react-navigation/stack';
 import DeviceStorageService from './DeviceStorageService';
 import styles from '../styles/DeviceControlScreen.styles';
-
-type RootStackParamList = {
-  Home: undefined;
-  BLEScan: undefined;
-  DeviceSetup: { device: { id: string; name: string; rssi: number | null } };
-  DeviceControl: { device: SavedDevice };
-};
-
-type NavigationProp = StackNavigationProp<RootStackParamList, 'DeviceControl'>;
-type RoutePropType = RouteProp<RootStackParamList, 'DeviceControl'>;
-
-interface OTAProgress {
-  in_progress: boolean;
-  progress?: number;
-  status?: string;
-}
+import { renderConnectionStatus, renderDeviceInfo } from './components/DeviceInfo';
+import { renderLightControl } from './components/LightControll';
+import { OTAProgress, NavigationProp, RoutePropType } from './types';
+import { IPCONFIG } from '../credentials';
+import { renderOTAControl, renderOTAModal } from './components/OTAControll';
+import { renderDeleteButton } from './components/DeleteButton';
 
 const DeviceControlScreen = () => {
   const route = useRoute<RoutePropType>();
   const { device } = route.params;
 
-  const otaUrl = `http://${IPCONFIG.ip}:${IPCONFIG.port}/light_client.bin`
   let fixedOtaProgress = 0;
 
   const navigation = useNavigation<NavigationProp>();
@@ -201,6 +186,7 @@ const DeviceControlScreen = () => {
   const startOTAUpdate = async () => {
     setLoading(true);
     try {
+      const otaUrl = `http://${IPCONFIG.ip}:${IPCONFIG.port}/light_client.bin`;
       await HTTPService.startOTAUpdate(device.ip, otaUrl);
       setShowOTAModal(false);
       
@@ -277,31 +263,6 @@ const DeviceControlScreen = () => {
     }, 300000);
   };
 
-    // Helper to format date/time to 'YYYY-MM-DD HH:mm:ss'
-  function formatDateTime(dateString: string, timeString?: string): string {
-    let dateObj: Date;
-    if (timeString) {
-      // firmwareInfo.date: "Jul 19 2025", firmwareInfo.time: "20:29:21"
-      // Parse month name to number
-      const [monthStr, day, year] = dateString.split(' ');
-      const monthMap: { [key: string]: string } = {
-        Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
-        Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
-      };
-      const month = monthMap[monthStr] || '01';
-      // Build ISO string: "2025-07-19T20:29:21"
-      const isoString = `${year}-${month}-${day}T${timeString}`;
-      dateObj = new Date(isoString);
-    } else {
-      // device.lastConnected: ISO string
-      dateObj = new Date(dateString);
-    }
-    if (isNaN(dateObj.getTime())) return dateString + (timeString ? ' ' + timeString : '');
-    // Format as YYYY-MM-DD HH:mm:ss
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
-  }
-
   const confirmDelete = (device: SavedDevice) => {
     Alert.alert(
       'Delete Device',
@@ -320,165 +281,7 @@ const DeviceControlScreen = () => {
       ]
     );
   };
-
-  const renderConnectionStatus = () => (
-    <View style={styles.statusContainer}>
-      <View style={[styles.statusDot, { backgroundColor: isConnected ? '#4CAF50' : '#f44336' }]} />
-      <Text style={[styles.statusText, { color: isConnected ? '#4CAF50' : '#f44336' }]}>
-        {isConnected ? 'Connected' : 'Offline'}
-      </Text>
-    </View>
-  );
-
-  const renderLightControl = () => (
-    <View style={styles.controlCard}>
-      <Text style={styles.cardTitle}>Light Control</Text>
-      <View style={styles.lightControl}>
-        <View style={styles.lightStatus}>
-          <View style={[styles.lightIndicator, { backgroundColor: lightState === 'on' ? '#FFC107' : '#666' }]} />
-          <Text style={styles.lightStateText}>Light is {lightState.toUpperCase()}</Text>
-        </View>
-        <View style={styles.controlButtons}>
-          <TouchableOpacity
-            style={[styles.controlButton, { opacity: loading || !isConnected ? 0.5 : 1 }]}
-            onPress={toggleLight}
-            disabled={loading || refresh || !isConnected}
-          >
-            {loading || refresh ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <Text style={styles.controlButtonText}>
-                {lightState === 'on' ? 'Turn OFF' : 'Turn ON'}
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  );
-
-  const renderDeviceInfo = () => (
-    <View style={styles.controlCard}>
-      <Text style={styles.cardTitle}>Device Information</Text>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>Name:</Text>
-        <Text style={styles.infoValue}>{device.name}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>ID:</Text>
-        <Text style={styles.infoValue}>{device.id}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>IP Address:</Text>
-        <Text style={styles.infoValue}>{device.ip}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>Project:</Text>
-        <Text style={styles.infoValue}>{device.projectName}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>Version:</Text>
-        <Text style={styles.infoValue}>{device.version}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>Last Connected:</Text>
-        <Text style={styles.infoValue}>{formatDateTime(device.lastConnected)}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>Build Date:</Text>
-        <Text style={styles.infoValue}>{formatDateTime(device.buildDate ?? '')}</Text>
-      </View>
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>OTA Status:</Text>
-        <Text style={[styles.infoValue, { color: device.otaStatus ? '#FF9800' : '#4CAF50' }]}>
-          {device.otaStatus ? 'In Progress' : 'Ready'}
-        </Text>
-      </View>
-    </View>
-  );
-
-  const renderOTAControl = () => (
-    <View style={styles.controlCard}>
-      <Text style={styles.cardTitle}>OTA Updates</Text>
-      <Text style={styles.cardDescription}>
-        Upload new firmware to your device over WiFi
-      </Text>
-      
-      {otaProgress?.in_progress && (
-        <View style={styles.otaProgress}>
-          <Text style={styles.otaStatusText}>{otaProgress.status}</Text>
-          {otaProgress.progress && (
-            <View style={styles.progressBar}>
-              <View 
-                style={[styles.progressFill, { width: `${otaProgress.progress}%` }]} 
-              />
-              <Text style={styles.progressText}>{otaProgress.progress.toFixed(0)}%</Text>
-            </View>
-          )}
-        </View>
-      )}
-      
-      <TouchableOpacity
-        style={[styles.secondaryButton, { 
-          opacity: loading || !isConnected || (otaProgress?.in_progress) ? 0.5 : 1 
-        }]}
-        onPress={() => setShowOTAModal(true)}
-        disabled={loading || !isConnected || (otaProgress?.in_progress)}
-      >
-        <Text style={styles.secondaryButtonText}>Start OTA Update</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const renderOTAModal = () => (
-    <Modal
-      visible={showOTAModal}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={() => setShowOTAModal(false)}
-    >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>OTA Update</Text>
-          <Text style={styles.modalDescription}>
-            Start ota from URL {otaUrl}
-          </Text>          
-          <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.cancelButton]}
-              onPress={() => setShowOTAModal(false)}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modalButton, styles.confirmButton]}
-              onPress={startOTAUpdate}
-              disabled={loading || refresh || otaLoading}
-            >
-              {loading || refresh || otaLoading ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.confirmButtonText}>Start Update</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    </Modal>
-  );
-
-  const renderDeleteButton = () => (
-    <TouchableOpacity
-      style={[styles.deleteButton, { 
-        opacity: loading || !isConnected ? 0.5 : 1 
-      }]}
-      onPress={() => confirmDelete(device)}
-      disabled={loading || !isConnected}
-    >
-      <Text style={styles.deleteButtonText}>Delete Device</Text>
-    </TouchableOpacity>
-  );
-
+  
   return (
     <ScrollView 
       style={styles.container}
@@ -495,14 +298,14 @@ const DeviceControlScreen = () => {
     >
       <View style={styles.header}>
         <Text style={styles.deviceName}>{device.name}</Text>
-        {renderConnectionStatus()}
+        {renderConnectionStatus(isConnected)}
       </View>
-      
-      {renderLightControl()}
-      {renderDeviceInfo()}
-      {renderOTAControl()}
-      {renderOTAModal()}
-      {renderDeleteButton()}
+
+      {renderLightControl(lightState, loading, refresh, isConnected, toggleLight)}
+      {renderDeviceInfo(device)}
+      {renderOTAControl(loading, isConnected, otaProgress, setShowOTAModal)}
+      {renderOTAModal(showOTAModal, setShowOTAModal, startOTAUpdate, loading, refresh, otaLoading)}
+      {renderDeleteButton(loading, isConnected, confirmDelete, device)}
     </ScrollView>
   );
 };
