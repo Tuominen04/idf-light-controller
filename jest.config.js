@@ -5,7 +5,7 @@ module.exports = {
   },
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(ts|tsx|js)$",
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
-  setupFiles: ['<rootDir>\\jest.setup.js'],
+  setupFiles: ['<rootDir>/jest.setup.js'],
   transformIgnorePatterns: [
     "node_modules/(?!(react-native"
       + "|@react-native"
