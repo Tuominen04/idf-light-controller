@@ -21,5 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Copy example credentials
+        run: cp src/credentials.example.ts src/credentials.ts
+
       - name: Run Jest tests
         run: npm test
