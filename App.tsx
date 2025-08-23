@@ -3,12 +3,12 @@ import { TouchableOpacity, Text, StyleSheet, View, ActivityIndicator } from 'rea
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { HomeScreen } from './src/screens/HomeScreen';
-import BLEScanScreen from './src/screens/BLEScanScreen';
-import DeviceSetupScreen from './src/screens/DeviceSetupScreen';
-import DeviceControlScreen from './src/screens/DeviceControlScreen';
-import BLEService from './src/services/BLEService';
-import { SavedDevice } from './src/services/DeviceStorageService';
+import { HomeScreen } from './src/home/HomeScreen';
+import BLEScanScreen from './src/ble/BLEScanScreen';
+import DeviceSetupScreen from './src/device/DeviceSetupScreen';
+import DeviceControlScreen from './src/device/DeviceControlScreen';
+import BLEService from './src/ble/BLEService';
+import { SavedDevice } from './src/device/DeviceStorageService';
 
 const Stack = createStackNavigator();
 

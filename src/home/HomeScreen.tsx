@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import DeviceStorageService, { SavedDevice } from '../services/DeviceStorageService';
-import HTTPService, { FirmwareInfo } from '../services/HTTPService';
+import DeviceStorageService, { SavedDevice } from '../device/DeviceStorageService';
+import HTTPService, { FirmwareInfo } from '../http/HTTPService';
 
 type RootStackParamList = {
   Home: undefined;

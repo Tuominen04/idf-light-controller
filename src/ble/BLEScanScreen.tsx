@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import BLEService from '../services/BLEService';
+import BLEService from './BLEService';
 
 type RootStackParamList = {
   Home: undefined;

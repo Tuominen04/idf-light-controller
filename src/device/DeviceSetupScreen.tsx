@@ -13,8 +13,8 @@ import {
 } from 'react-native';
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import BLEService from '../services/BLEService';
-import DeviceStorageService from '../services/DeviceStorageService';
+import BLEService from '../ble/BLEService';
+import DeviceStorageService from './DeviceStorageService';
 import { CREDENTIALS } from '../credentials';
 
 // Constants for storage (not needed anymore as it's in the service)

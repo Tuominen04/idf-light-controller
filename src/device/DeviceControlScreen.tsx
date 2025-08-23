@@ -11,11 +11,11 @@ import {
   RefreshControl,
 } from 'react-native';
 import { useRoute, RouteProp, useNavigation, useFocusEffect } from '@react-navigation/native';
-import { SavedDevice } from '../services/DeviceStorageService';
-import HTTPService from '../services/HTTPService';
+import { SavedDevice } from './DeviceStorageService';
+import HTTPService from '../http/HTTPService';
 import { IPCONFIG } from '../credentials';
 import { StackNavigationProp } from '@react-navigation/stack';
-import DeviceStorageService from '../services/DeviceStorageService';
+import DeviceStorageService from './DeviceStorageService';
 
 type RootStackParamList = {
   Home: undefined;
