@@ -1,0 +1,304 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DeviceInfo renderDeviceInfo matches snapshot for device info 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#fff",
+      "borderRadius": 12,
+      "elevation": 3,
+      "margin": 16,
+      "padding": 20,
+      "shadowColor": "#000",
+      "shadowOffset": {
+        "height": 2,
+        "width": 0,
+      },
+      "shadowOpacity": 0.1,
+      "shadowRadius": 4,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "color": "#333",
+        "fontSize": 20,
+        "fontWeight": "600",
+        "marginBottom": 16,
+      }
+    }
+  >
+    Device Information
+  </Text>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#666",
+          "flex": 1,
+          "fontSize": 14,
+        }
+      }
+    >
+      Name:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#333",
+          "flex": 2,
+          "fontSize": 14,
+          "textAlign": "right",
+        }
+      }
+    >
+      Test Device
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#666",
+          "flex": 1,
+          "fontSize": 14,
+        }
+      }
+    >
+      ID:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#333",
+          "flex": 2,
+          "fontSize": 14,
+          "textAlign": "right",
+        }
+      }
+    >
+      1
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#666",
+          "flex": 1,
+          "fontSize": 14,
+        }
+      }
+    >
+      IP Address:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#333",
+          "flex": 2,
+          "fontSize": 14,
+          "textAlign": "right",
+        }
+      }
+    >
+      192.168.1.1
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#666",
+          "flex": 1,
+          "fontSize": 14,
+        }
+      }
+    >
+      Project:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#333",
+          "flex": 2,
+          "fontSize": 14,
+          "textAlign": "right",
+        }
+      }
+    >
+      Test Project
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#666",
+          "flex": 1,
+          "fontSize": 14,
+        }
+      }
+    >
+      Version:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#333",
+          "flex": 2,
+          "fontSize": 14,
+          "textAlign": "right",
+        }
+      }
+    >
+      1.0.0
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#666",
+          "flex": 1,
+          "fontSize": 14,
+        }
+      }
+    >
+      Last Connected:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#333",
+          "flex": 2,
+          "fontSize": 14,
+          "textAlign": "right",
+        }
+      }
+    >
+      2025-01-01 02:00
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#666",
+          "flex": 1,
+          "fontSize": 14,
+        }
+      }
+    >
+      Build Date:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#333",
+          "flex": 2,
+          "fontSize": 14,
+          "textAlign": "right",
+        }
+      }
+    >
+      2025-02-02 02:00
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "justifyContent": "space-between",
+        "marginBottom": 12,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#666",
+          "flex": 1,
+          "fontSize": 14,
+        }
+      }
+    >
+      OTA Status:
+    </Text>
+    <Text
+      style={
+        [
+          {
+            "color": "#333",
+            "flex": 2,
+            "fontSize": 14,
+            "textAlign": "right",
+          },
+          {
+            "color": "#4CAF50",
+          },
+        ]
+      }
+    >
+      Ready
+    </Text>
+  </View>
+</View>
+`;

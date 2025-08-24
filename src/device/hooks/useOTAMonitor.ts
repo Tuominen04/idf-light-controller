@@ -13,8 +13,6 @@ export function useOTAMonitor(
   let fixedOtaProgress = 0;
 
   useEffect(() => {
-    console.log("MONITOR OTA Effect Triggered");
-    console.log("MONITOR OTA State:", { monitoringOTA, device });
     if (!monitoringOTA) return;
 
     if (otaIntervalRef.current) {
@@ -23,10 +21,8 @@ export function useOTAMonitor(
     }
 
     otaIntervalRef.current = setInterval(async () => {
-      console.log("MONITOR OTA Interval Triggered");
       try {
         const progress = await HTTPService.getOTAProgress(device.ip);
-        console.log("MONITOR OTA Progress:", progress);
         if (!progress) {
           console.warn('No OTA progress data received');
           return;
