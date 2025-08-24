@@ -226,7 +226,7 @@ exports[`DeviceInfo renderDeviceInfo matches snapshot for device info 1`] = `
         }
       }
     >
-      2025-01-01 02:00
+      2025-01-01 00:00
     </Text>
   </View>
   <View
@@ -259,7 +259,7 @@ exports[`DeviceInfo renderDeviceInfo matches snapshot for device info 1`] = `
         }
       }
     >
-      2025-02-02 02:00
+      2025-02-02 00:00
     </Text>
   </View>
   <View

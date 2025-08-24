@@ -8,12 +8,15 @@
  * - Includes snapshot and style tests for comprehensive coverage.
  * 
  * @note
- * - If the UI changes intentionally, update the snapshot by running `jest -u` and commit the new snapshot.
+ * - If the UI changes intentionally, update the snapshot by running `npm test -- -u` (on Windows) and commit the new snapshot.
  */
 
 import { render, screen, waitFor } from "@testing-library/react-native";
 import { renderConnectionStatus, renderDeviceInfo } from '../../../src/device/components/DeviceInfo';
 import { SavedDevice } from "../../../src/device/services/DeviceStorageService";
+import timezone_mock from 'timezone-mock';
+
+timezone_mock.register('UTC');
 
 // Tests for the renderConnectionStatus helper
 describe('DeviceInfo renderConnectionStatus', () => {
@@ -83,9 +86,9 @@ describe('DeviceInfo renderDeviceInfo', () => {
       expect(screen.getByText(/Version:/i)).toBeTruthy();
       expect(screen.getByText(/1.0.0/i)).toBeTruthy();
       expect(screen.getByText(/Last Connected:/i)).toBeTruthy();
-      expect(screen.getByText(/2025-01-01 02:00/i)).toBeTruthy();
+      expect(screen.getByText(/2025-01-01 00:00/i)).toBeTruthy();
       expect(screen.getByText(/Build Date:/i)).toBeTruthy();
-      expect(screen.getByText(/2025-02-02 02:00/i)).toBeTruthy();
+      expect(screen.getByText(/2025-02-02 00:00/i)).toBeTruthy();
       expect(screen.getByText(/OTA Status:/i)).toBeTruthy();
       expect(screen.getByText(/Ready/i)).toBeTruthy();
     });
