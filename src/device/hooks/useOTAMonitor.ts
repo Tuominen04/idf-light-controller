@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import HTTPService from "../../http/HTTPService";
-import DeviceStorageService, { SavedDevice } from "../DeviceStorageService";
+import DeviceStorageService, { SavedDevice } from "../services/DeviceStorageService";
 import { OTAProgress } from "../types";
 
 export function useOTAMonitor(

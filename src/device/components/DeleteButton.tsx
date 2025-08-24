@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity } from "react-native";
 import styles from "../../styles/DeviceControlScreen.styles";
 import { confirmDelete } from "../services/DeviceService";
-import { SavedDevice } from "../DeviceStorageService";
+import { SavedDevice } from "../services/DeviceStorageService";
 
 export const renderDeleteButton = (loading: boolean, isConnected: boolean, device: SavedDevice, navigation: any) => (
     <TouchableOpacity

@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 import styles from "../../styles/DeviceControlScreen.styles";
-import { SavedDevice } from "../DeviceStorageService";
+import { SavedDevice } from "../services/DeviceStorageService";
 import { formatDateTime } from "../../utils/FormatDateTime";
 
 export const renderConnectionStatus = (isConnected: boolean) => (

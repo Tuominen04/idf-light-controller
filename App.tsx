@@ -8,7 +8,7 @@ import BLEScanScreen from './src/ble/BLEScanScreen';
 import DeviceSetupScreen from './src/device/DeviceSetupScreen';
 import DeviceControlScreen from './src/device/DeviceControlScreen';
 import BLEService from './src/ble/BLEService';
-import { SavedDevice } from './src/device/DeviceStorageService';
+import { SavedDevice } from './src/device/services/DeviceStorageService';
 import styles from './src/styles/App.styles';
 
 const Stack = createStackNavigator();

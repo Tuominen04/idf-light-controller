@@ -13,7 +13,7 @@ import {
 import { useRoute, useNavigation, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import BLEService from '../ble/BLEService';
-import DeviceStorageService from './DeviceStorageService';
+import DeviceStorageService from './services/DeviceStorageService';
 import { CREDENTIALS } from '../credentials';
 import styles from '../styles/DeviceSetupScreen.styles';
 

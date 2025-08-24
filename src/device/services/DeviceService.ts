@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 import HTTPService, { OTAProgress } from "../../http/HTTPService";
-import DeviceStorageService, { SavedDevice } from "../DeviceStorageService";
+import DeviceStorageService, { SavedDevice } from "./DeviceStorageService";
 import { otaUrl  } from "../../credentials";
 
 async function getOtaProgress(

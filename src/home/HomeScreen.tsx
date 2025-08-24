@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import DeviceStorageService, { SavedDevice } from '../device/DeviceStorageService';
+import DeviceStorageService, { SavedDevice } from '../device/services/DeviceStorageService';
 import HTTPService, { FirmwareInfo } from '../http/HTTPService';
 import styles from '../styles/HomeScreen.styles';
 
