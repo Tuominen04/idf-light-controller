@@ -56,38 +56,38 @@ export const HomeScreen = () => {
  * 
  * @param deviceList Array of SavedDevice objects to check connectivity for.
  */
-const checkDeviceConnectivity = async (deviceList: SavedDevice[]) => {
-  const batchSize = 5; // Limit to 5 concurrent requests for performance
-  let statuses: { [key: string]: boolean } = {};
+  const checkDeviceConnectivity = async (deviceList: SavedDevice[]) => {
+    const batchSize = 5; // Limit to 5 concurrent requests for performance
+    let statuses: { [key: string]: boolean } = {};
 
-  // Process devices in batches to avoid overwhelming the network
-  for (let i = 0; i < deviceList.length; i += batchSize) {
-    const batch = deviceList.slice(i, i + batchSize);
+    // Process devices in batches to avoid overwhelming the network
+    for (let i = 0; i < deviceList.length; i += batchSize) {
+      const batch = deviceList.slice(i, i + batchSize);
 
-    // For each device in the batch, check its connection status
-    const batchPromises = batch.map(async (device) => {
-      try {
-        // Attempt to check if the device is connected via its IP
-        const isConnected = await HTTPService.checkConnection(device.ip);
-        return { [device.id]: isConnected };
-      } catch (error) {
-        // If an error occurs, mark the device as offline
-        return { [device.id]: false };
-      }
-    });
+      // For each device in the batch, check its connection status
+      const batchPromises = batch.map(async (device) => {
+        try {
+          // Attempt to check if the device is connected via its IP
+          const isConnected = await HTTPService.checkConnection(device.ip);
+          return { [device.id]: isConnected };
+        } catch (error) {
+          // If an error occurs, mark the device as offline
+          return { [device.id]: false };
+        }
+      });
 
-    // Wait for all checks in the batch to complete
-    const batchResults = await Promise.all(batchPromises);
+      // Wait for all checks in the batch to complete
+      const batchResults = await Promise.all(batchPromises);
 
-    // Merge batch results into the overall statuses object
-    batchResults.forEach((status) => {
-      statuses = { ...statuses, ...status };
-    });
-  }
+      // Merge batch results into the overall statuses object
+      batchResults.forEach((status) => {
+        statuses = { ...statuses, ...status };
+      });
+    }
 
-  // Update state with the latest connectivity statuses
-  setDeviceStatuses(statuses);
-};
+    // Update state with the latest connectivity statuses
+    setDeviceStatuses(statuses);
+  };
 
   const fetchDeviceDetails = async (deviceList: SavedDevice[]) => {
     try {

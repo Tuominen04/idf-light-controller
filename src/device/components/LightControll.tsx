@@ -1,7 +1,14 @@
 import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import styles from "../../styles/DeviceControlScreen.styles";
 
-export const renderLightControl = (lightState: string, loading: boolean, refresh: boolean, isConnected: boolean, toggleLight: () => void) => (
+export const renderLightControl = (
+  lightState: string, 
+  loading: boolean, 
+  refresh: boolean, 
+  isConnected: boolean, 
+  otaLoading: boolean, 
+  toggleLight: () => void
+) => (
     <View style={styles.controlCard}>
       <Text style={styles.cardTitle}>Light Control</Text>
       <View style={styles.lightControl}>
@@ -13,7 +20,7 @@ export const renderLightControl = (lightState: string, loading: boolean, refresh
           <TouchableOpacity
             style={[styles.controlButton, { opacity: loading || !isConnected ? 0.5 : 1 }]}
             onPress={toggleLight}
-            disabled={loading || refresh || !isConnected}
+            disabled={loading || refresh || !isConnected || otaLoading}
           >
             {loading || refresh ? (
               <ActivityIndicator size="small" color="#fff" />

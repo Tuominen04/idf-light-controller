@@ -7,3 +7,5 @@ export const IPCONFIG = {
     ip: "123.456.1.100",
     port: 8080,
 }
+
+export const otaUrl = `http://${IPCONFIG.ip}:${IPCONFIG.port}/esp32projectname.bin`;
