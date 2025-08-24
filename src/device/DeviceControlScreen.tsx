@@ -4,12 +4,13 @@ import { useRoute, useFocusEffect, useNavigation } from '@react-navigation/nativ
 import styles from '../styles/DeviceControlScreen.styles';
 import { renderConnectionStatus, renderDeviceInfo } from './components/DeviceInfo';
 import { renderLightControl } from './components/LightControll';
-import { OTAProgress, RoutePropType } from './types';
+import { RoutePropType } from './deviceTypes';
 import { renderOTAControl, renderOTAModal } from './components/OTAControll';
 import { renderDeleteButton } from './components/DeleteButton';
 import { deviceInfo, toggleLight, startOTAUpdate, deviceConnection, } from './services/DeviceService';
 import { useOTAMonitor } from './hooks/useOTAMonitor';
 import { onRefresh } from './hooks/useDeviceConnection';
+import { OTAProgress } from '../types';
 
 const DeviceControlScreen = () => {
   const route = useRoute<RoutePropType>();
@@ -24,7 +25,6 @@ const DeviceControlScreen = () => {
   const [refresh, setRefreshing] = useState(false);
   const [otaProgress, setOTAProgress] = useState<OTAProgress | null>(null);
   const [showOTAModal, setShowOTAModal] = useState(false);
-  const [monitoringOTA, setMonitoringOTA] = useState(false);
   const otaIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Clear interval on unmount
@@ -56,7 +56,6 @@ const DeviceControlScreen = () => {
       setLoading,
       setShowOTAModal
     );
-    setMonitoringOTA(true);
   };
 
   const deviceInfoHandler = async () => {
@@ -84,8 +83,7 @@ const DeviceControlScreen = () => {
   };
 
   useOTAMonitor(
-    monitoringOTA,
-    setMonitoringOTA,
+    otaProgress?.in_progress ?? false,
     device,
     setOTAProgress,
     deviceInfoHandler
@@ -110,11 +108,34 @@ const DeviceControlScreen = () => {
         {renderConnectionStatus(isConnected)}
       </View>
 
-      {renderLightControl(lightState, loading, refresh, isConnected, otaLoading, toggleLightHandler)}
+      {renderLightControl(
+        lightState, 
+        loading, 
+        refresh, 
+        isConnected, 
+        otaLoading, 
+        toggleLightHandler
+      )}
       {renderDeviceInfo(device)}
-      {renderOTAControl(loading, isConnected, otaProgress, setShowOTAModal)}
-      {renderOTAModal(showOTAModal, setShowOTAModal, startOTAUpdateHandler, loading, refresh, otaLoading)}
-      {renderDeleteButton(loading, isConnected, device, navigation)}
+      {renderOTAControl(loading, 
+        isConnected, 
+        otaProgress, 
+        setShowOTAModal
+      )}
+      {renderOTAModal(
+        showOTAModal, 
+        setShowOTAModal, 
+        startOTAUpdateHandler, 
+        loading, 
+        refresh, 
+        otaLoading
+      )}
+      {renderDeleteButton(
+        loading, 
+        isConnected, 
+        device, 
+        navigation
+      )}
     </ScrollView>
   );
 };

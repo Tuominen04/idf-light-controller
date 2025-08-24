@@ -1,11 +1,10 @@
 import { useEffect, useRef } from "react";
 import HTTPService from "../../http/HTTPService";
 import DeviceStorageService, { SavedDevice } from "../services/DeviceStorageService";
-import { OTAProgress } from "../types";
+import { OTAProgress } from "../../types";
 
 export function useOTAMonitor(
   monitoringOTA: boolean,
-  setMonitoringOTA: (monitoring: boolean) => void,
   device: SavedDevice,
   setOTAProgress: (progress: OTAProgress | null) => void,
   deviceInfoHandler: () => Promise<void>
@@ -44,7 +43,6 @@ export function useOTAMonitor(
             otaIntervalRef.current = null;
           }
           setOTAProgress(null);
-          setMonitoringOTA(false);
           const deviceInfo = await DeviceStorageService.getDevice(device.id);
           if (deviceInfo) {
             await DeviceStorageService.saveDevice({ ...deviceInfo, otaStatus: false });
@@ -64,5 +62,5 @@ export function useOTAMonitor(
         otaIntervalRef.current = null;
       }
     };
-  }, [monitoringOTA, device, setOTAProgress, setMonitoringOTA, deviceInfoHandler]);
+  }, [monitoringOTA, device, setOTAProgress, deviceInfoHandler]);
 }

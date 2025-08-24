@@ -2,12 +2,6 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { SavedDevice } from "./services/DeviceStorageService";
 import { RouteProp } from "@react-navigation/native";
 
-export interface OTAProgress {
-  in_progress: boolean;
-  progress?: number;
-  status?: string;
-}
-
 type RootStackParamList = {
   Home: undefined;
   BLEScan: undefined;

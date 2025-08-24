@@ -1,6 +1,6 @@
 import { ActivityIndicator, Modal, Text, TouchableOpacity, View } from "react-native";
 import styles from "../../styles/DeviceControlScreen.styles";
-import { OTAProgress } from "../types";
+import { OTAProgress } from "../../types";
 import { otaUrl } from "../../credentials";
 
 export const renderOTAControl = (

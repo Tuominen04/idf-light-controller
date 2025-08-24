@@ -1,4 +1,5 @@
 import { API_ENDPOINTS } from '../utils/constants';
+import { OTAProgress } from '../types';
 
 interface DeviceStatus {
   device: number;
@@ -12,12 +13,6 @@ interface FirmwareInfo {
   date: string;
   time: string;
   ota_in_progress: boolean;
-}
-
-interface OTAProgress {
-  in_progress: boolean;
-  progress?: number;
-  status?: string;
 }
 
 interface OTAUpdateResponse {
