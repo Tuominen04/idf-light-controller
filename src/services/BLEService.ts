@@ -100,7 +100,6 @@ class BLEServiceClass {
 
     console.log('Starting BLE scan for', BLE_CONSTANTS.DEVICE_NAME_PREFIX);
     this.scanning = true;
-    const foundDevices = new Map<string, Device>();
 
     this.manager.startDeviceScan(
       null, // Scan for all services

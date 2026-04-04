@@ -49,7 +49,7 @@ const DeviceSetupScreen = () => {
 
     try {
       setLoading(true);
-      setStatus('handleSendCredentials Sending WiFi credentials...');
+      setStatus('Sending WiFi credentials...');
 
       // Send WiFi credentials
       await BLEService.sendWiFiCredentials(ssid, password);
