@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { HomeScreen } from './../src/home/HomeScreen';
+import { HomeScreen } from '../src/screens/HomeScreen';
 
 test('renders HomeScreen', async () => {
   render(

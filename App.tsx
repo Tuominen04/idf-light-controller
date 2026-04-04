@@ -3,7 +3,7 @@ import { TouchableOpacity, Text, StyleSheet, View, ActivityIndicator } from 'rea
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { HomeScreen } from './src/home/HomeScreen';
+import { HomeScreen } from './src/screens/HomeScreen';
 import BLEScanScreen from './src/ble/BLEScanScreen';
 import DeviceSetupScreen from './src/device/DeviceSetupScreen';
 import DeviceControlScreen from './src/device/DeviceControlScreen';
