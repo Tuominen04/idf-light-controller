@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, Text, StyleSheet, View, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View, ActivityIndicator, InteractionManager } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -26,11 +26,15 @@ const App = () => {
   const [initError, setInitError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Initialize BLE when app starts
-    initializeBLE();
+    // Delay BLE initialization until after interactions/animations settle
+    // and the Activity is fully attached (avoids E_INVALID_ACTIVITY crash)
+    const task = InteractionManager.runAfterInteractions(() => {
+      initializeBLE();
+    });
 
     // Cleanup when app closes
     return () => {
+      task.cancel();
       BLEService.destroy();
     };
   }, []);
