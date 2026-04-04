@@ -29,10 +29,11 @@ export const renderOTAControl = (
     )}
     <TouchableOpacity
       style={[styles.secondaryButton, { 
-        opacity: loading || !isConnected || (otaProgress?.in_progress) ? 0.5 : 1 
+        opacity: loading || !isConnected || otaProgress?.in_progress ? 0.5 : 1 
       }]}
       onPress={() => setShowOTAModal(true)}
-      disabled={loading || !isConnected || (otaProgress?.in_progress)}
+      disabled={loading || !isConnected || otaProgress?.in_progress}
+      testID="start-ota-update-button"
     >
       <Text style={styles.secondaryButtonText}>Start OTA Update</Text>
     </TouchableOpacity>
