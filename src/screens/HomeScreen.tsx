@@ -8,8 +8,8 @@ import {
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import DeviceStorageService, { SavedDevice } from '../device/services/DeviceStorageService';
-import HTTPService, { FirmwareInfo } from '../http/HTTPService';
+import DeviceStorageService, { SavedDevice } from '../services/DeviceStorageService';
+import HTTPService, { FirmwareInfo } from '../services/HTTPService';
 import styles from '../styles/HomeScreen.styles';
 
 type RootStackParamList = {

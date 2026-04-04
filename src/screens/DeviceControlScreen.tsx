@@ -2,14 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, ScrollView, RefreshControl } from 'react-native';
 import { useRoute, useFocusEffect, useNavigation } from '@react-navigation/native';
 import styles from '../styles/DeviceControlScreen.styles';
-import { renderConnectionStatus, renderDeviceInfo } from './components/DeviceInfo';
-import { renderLightControl } from './components/LightControl';
-import { RoutePropType } from './deviceTypes';
-import { renderOTAControl, renderOTAModal } from './components/OTAControl';
-import { renderDeleteButton } from './components/DeleteButton';
-import { deviceInfo, toggleLight, startOTAUpdate, deviceConnection, } from './services/DeviceService';
-import { useOTAMonitor } from './hooks/useOTAMonitor';
-import { onRefresh } from './hooks/useDeviceConnection';
+import { renderConnectionStatus, renderDeviceInfo } from '../device/components/DeviceInfo';
+import { renderLightControl } from '../device/components/LightControl';
+import { RoutePropType } from '../device/deviceTypes';
+import { renderOTAControl, renderOTAModal } from '../device/components/OTAControl';
+import { renderDeleteButton } from '../device/components/DeleteButton';
+import { deviceInfo, toggleLight, startOTAUpdate, deviceConnection, } from '../services/DeviceService';
+import { useOTAMonitor } from '../device/hooks/useOTAMonitor';
+import { onRefresh } from '../device/hooks/useDeviceConnection';
 import { OTAProgress } from '../types';
 
 const DeviceControlScreen = () => {

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import BLEService from './BLEService';
+import BLEService from '../services/BLEService';
 import styles from '../styles/BLEScanScreen.styles';
 
 type RootStackParamList = {
