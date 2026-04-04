@@ -5,11 +5,8 @@ import { SavedDevice } from "../../services/DeviceStorageService";
 
 export const renderDeleteButton = (loading: boolean, isConnected: boolean, device: SavedDevice, navigation: any) => (
     <TouchableOpacity
-      style={[styles.deleteButton, { 
-        opacity: loading || !isConnected ? 0.5 : 1 
-      }]}
+      style={styles.deleteButton}
       onPress={() => confirmDelete(device, navigation)}
-      disabled={loading || !isConnected}
     >
       <Text style={styles.deleteButtonText}>Delete Device</Text>
     </TouchableOpacity>
