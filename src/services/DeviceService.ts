@@ -107,7 +107,7 @@ export async function deviceConnection(
       console.error('Connection check failed:', error);
       setIsConnected(false);
     }
-  };
+};
 
 export async function toggleLight(
   isConnected: boolean, 
