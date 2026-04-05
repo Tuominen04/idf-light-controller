@@ -10,7 +10,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import DeviceControlScreen from './../../src/device/DeviceControlScreen';
+import DeviceControlScreen from './../../src/screens/DeviceControlScreen';
 
 // Mock useRoute to provide a route object
 jest.mock('@react-navigation/native', () => {
