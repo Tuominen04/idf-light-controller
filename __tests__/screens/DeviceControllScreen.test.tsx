@@ -25,7 +25,7 @@ jest.mock('@react-navigation/native', () => {
   };
 });
 
-jest.mock('./../../src/device/services/DeviceService', () => ({
+jest.mock('./../../src/services/DeviceService', () => ({
   deviceInfo: (_device: any, _setLoading: any, setIsConnected: any, _setLightState: any) => {
     setIsConnected(true);
     return Promise.resolve();

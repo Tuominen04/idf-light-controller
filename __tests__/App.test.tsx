@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react-native';
 import App from './../App';
 
-jest.mock('./../src/ble/BLEService', () => ({
+jest.mock('./../src/services/BLEService', () => ({
   initialize: jest.fn(() => Promise.resolve()),
   destroy: jest.fn(),
 }));
